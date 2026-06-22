@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Muse · 全球首个面向知识工作者的主动灵感采集与创作引擎</title>
+<meta name="description" content="全球首个面向知识工作者的主动式灵感采集与创作引擎。100%开源。主动捕捉 → 基于DNA主动创作 → Ship。">
+<style>
+:root{--bg:#0a0a0f;--surface:#12121a;--surface2:#1a1a2e;--border:#2a2a3e;--text:#e4e4f0;--dim:#8888a0;--accent:#6366f1;--accent2:#a855f7;--pink:#ec4899;--grad:linear-gradient(135deg,#6366f1,#a855f7);--grad3:linear-gradient(135deg,#6366f1,#a855f7,#ec4899)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;line-height:1.6}
+
+/* Animated orbs */
+.orbs{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.orb{position:absolute;border-radius:50%;filter:blur(100px);opacity:.12}
+.orb:nth-child(1){width:500px;height:500px;background:#6366f1;top:-150px;left:-100px;animation:f1 20s infinite ease-in-out}
+.orb:nth-child(2){width:400px;height:400px;background:#a855f7;top:30%;right:-100px;animation:f2 25s infinite ease-in-out}
+.orb:nth-child(3){width:350px;height:350px;background:#ec4899;bottom:-100px;left:40%;animation:f3 18s infinite ease-in-out}
+@keyframes f1{0%,100%{transform:translate(0,0)scale(1)}50%{transform:translate(80px,60px)scale(1.2)}}
+@keyframes f2{0%,100%{transform:translate(0,0)scale(1)}50%{transform:translate(-60px,80px)scale(.9)}}
+@keyframes f3{0%,100%{transform:translate(0,0)scale(1)}50%{transform:translate(40px,-60px)scale(1.1)}}
+
+.wrap{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 24px}
+
+/* Nav */
+nav{position:sticky;top:0;z-index:50;background:rgba(10,10,15,.7);backdrop-filter:blur(20px);border-bottom:1px solid rgba(42,42,62,.5)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;padding:16px 0}
+.brand{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:800}
+.brand-icon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:20px;filter:drop-shadow(0 0 8px rgba(99,102,241,.5))}
+.brand-text{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;gap:32px;font-size:14px}
+.nav-links a{color:var(--dim);text-decoration:none;transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{padding:8px 20px;border-radius:8px;background:var(--grad);color:#fff;font-size:13px;font-weight:600;border:none;cursor:pointer;text-decoration:none}
+
+/* Hero */
+.hero{text-align:center;padding:100px 0 80px;position:relative}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:20px;background:var(--surface);border:1px solid var(--border);font-size:12px;color:var(--dim);margin-bottom:28px}
+.hero-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero h1{font-size:56px;font-weight:800;line-height:1.15;margin-bottom:20px;letter-spacing:-1px}
+.hero h1 .grad{background:var(--grad3);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p.sub{font-size:18px;color:var(--dim);max-width:600px;margin:0 auto 36px;line-height:1.7}
+.hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn-lg{padding:14px 32px;border-radius:12px;font-size:15px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:all .2s;border:none;cursor:pointer;font-family:inherit}
+.btn-grad{background:var(--grad);color:#fff;box-shadow:0 4px 24px rgba(99,102,241,.3)}
+.btn-grad:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(99,102,241,.4)}
+.btn-outline{background:transparent;color:var(--text);border:1px solid var(--border)}
+.btn-outline:hover{border-color:var(--accent);background:var(--surface)}
+
+/* Hero mockup */
+.hero-mockup{margin:60px auto 0;max-width:900px;border-radius:16px;overflow:hidden;border:1px solid var(--border);background:var(--surface);box-shadow:0 20px 80px rgba(0,0,0,.4)}
+.mockup-bar{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--surface2);border-bottom:1px solid var(--border)}
+.mockup-bar .dot-r{width:10px;height:10px;border-radius:50%;background:#ff5f57}
+.mockup-bar .dot-y{width:10px;height:10px;border-radius:50%;background:#febc2e}
+.mockup-bar .dot-g{width:10px;height:10px;border-radius:50%;background:#28c840}
+.mockup-bar .url{margin-left:12px;font-size:12px;color:var(--dim);padding:4px 12px;background:var(--bg);border-radius:6px;flex:1}
+.mockup-content{padding:24px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.mock-card{background:var(--surface2);border-radius:10px;padding:14px;border-left:3px solid}
+.mock-card.p{border-left-color:var(--accent2)}
+.mock-card.a{border-left-color:var(--amber,#f59e0b)}
+.mock-card.b{border-left-color:var(--blue,#3b82f6)}
+.mock-card-title{font-size:13px;font-weight:600;margin-bottom:4px}
+.mock-card-summary{font-size:11px;color:var(--dim);line-height:1.4}
+.mock-chips{display:flex;gap:4px;margin-top:6px}
+.mock-chip{font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(99,102,241,.15);color:var(--accent)}
+
+/* Features */
+.section{padding:80px 0}
+.section-title{text-align:center;font-size:36px;font-weight:800;margin-bottom:12px}
+.section-title .grad{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.section-sub{text-align:center;color:var(--dim);font-size:16px;margin-bottom:48px}
+
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.feature-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;transition:all .3s;position:relative;overflow:hidden}
+.feature-card:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:0 12px 40px rgba(99,102,241,.15)}
+.feature-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:var(--grad);opacity:0;transition:opacity .3s}
+.feature-card:hover::before{opacity:1}
+.feature-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:16px;background:var(--surface2)}
+.feature-icon.g1{background:rgba(99,102,241,.12)}
+.feature-icon.g2{background:rgba(168,85,247,.12)}
+.feature-icon.g3{background:rgba(236,72,153,.12)}
+.feature-title{font-size:18px;font-weight:700;margin-bottom:8px}
+.feature-desc{font-size:14px;color:var(--dim);line-height:1.6}
+
+/* Flow */
+.flow{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:40px}
+.flow-step{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 24px;text-align:center;min-width:140px;transition:all .2s}
+.flow-step:hover{border-color:var(--accent);transform:translateY(-2px)}
+.flow-icon{font-size:28px;margin-bottom:6px}
+.flow-label{font-size:13px;font-weight:600}
+.flow-arrow{color:var(--accent);font-size:20px}
+
+/* Models section */
+.models-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-top:32px}
+.model-badge{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;gap:12px;transition:all .2s}
+.model-badge:hover{border-color:var(--accent)}
+.model-logo{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+.model-name{font-size:13px;font-weight:600}
+.model-task{font-size:11px;color:var(--dim)}
+
+/* Compatibility */
+.compat-bar{display:flex;justify-content:center;gap:32px;flex-wrap:wrap;margin-top:32px}
+.compat-item{display:flex;flex-direction:column;align-items:center;gap:8px}
+.compat-icon{width:56px;height:56px;border-radius:16px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;transition:all .2s}
+.compat-item:hover .compat-icon{transform:scale(1.05);border-color:var(--accent)}
+.compat-label{font-size:12px;color:var(--dim)}
+
+/* Extension CTA */
+.cta-section{text-align:center;padding:80px 24px;background:var(--surface);border-radius:24px;border:1px solid var(--border);margin:40px 0;position:relative;overflow:hidden}
+.cta-section::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at center,rgba(99,102,241,.1),transparent 50%)}
+.cta-section > *{position:relative}
+.cta-section h2{font-size:32px;font-weight:800;margin-bottom:12px}
+.cta-section h2 .grad{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.cta-section p{color:var(--dim);font-size:16px;margin-bottom:28px}
+.ext-buttons{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.ext-btn{display:flex;align-items:center;gap:10px;padding:12px 24px;border-radius:12px;background:var(--surface2);border:1px solid var(--border);color:var(--text);text-decoration:none;font-size:14px;font-weight:600;transition:all .2s}
+.ext-btn:hover{transform:translateY(-2px);border-color:var(--accent);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.ext-btn .icon{font-size:22px}
+
+/* Footer */
+footer{border-top:1px solid var(--border);padding:40px 0;margin-top:40px}
+.footer-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+.footer-brand{font-size:14px;color:var(--dim)}
+.footer-links{display:flex;gap:24px;font-size:13px}
+.footer-links a{color:var(--dim);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--text)}
+
+/* Stats strip */
+.stats-strip{display:flex;justify-content:center;gap:48px;margin:40px 0;flex-wrap:wrap}
+.stat-item{text-align:center}
+.stat-num{font-size:40px;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-label{font-size:13px;color:var(--dim);margin-top:4px}
+
+@media(max-width:768px){
+    .hero h1{font-size:36px}
+    .features-grid,.models-grid{grid-template-columns:1fr}
+    .mockup-content{grid-template-columns:1fr}
+    .nav-links{display:none}
+    .flow{flex-direction:column}
+    .flow-arrow{transform:rotate(90deg)}
+}
+</style>
+</head>
+<body>
+
+<div class="orbs"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
+
+<!-- Nav -->
+<nav>
+    <div class="wrap nav-inner">
+        <div class="brand">
+            <span class="brand-icon">✦</span>
+            <span class="brand-text">Muse</span>
+        </div>
+        <div class="nav-links">
+            <a href="#features">功能</a>
+            <a href="#how">原理</a>
+            <a href="#models">AI模型</a>
+            <a href="#install">安装</a>
+            <a href="https://muse-xi-murex.vercel.app/onboarding" target="_blank">体验</a>
+        </div>
+        <a href="#install" class="nav-cta">安装插件</a>
+    </div>
+</nav>
+
+<!-- Hero -->
+<!-- Hero -->
+<section class="hero">
+    <div class="wrap">
+        <div class="hero-badge"><span class="dot"></span> 全球首个面向知识工作者的主动灵感采集与创作引擎 · 100% 开源</div>
+        <h1>灵感本易逝<br><span class="grad">行动应当时</span></h1>
+        <p class="sub">全球首个面向知识工作者的主动灵感采集与创作引擎。100% 开源。</p>
+        <div class="hero-btns">
+            <a href="#install" class="btn-lg btn-grad">✦ 安装浏览器插件</a>
+            <a href="https://muse-xi-murex.vercel.app/onboarding" target="_blank" class="btn-lg btn-outline">在线体验 →</a>
+        </div>
+
+        <!-- Stats strip -->
+        <div class="stats-strip">
+            <div class="stat-item"><div class="stat-num">100+</div><div class="stat-label">AI模型</div></div>
+            <div class="stat-item"><div class="stat-num">∞</div><div class="stat-label">Agent兼容</div></div>
+            <div class="stat-item"><div class="stat-num">100%</div><div class="stat-label">开源</div></div>
+            <div class="stat-item"><div class="stat-num">0</div><div class="stat-label">配置门槛</div></div>
+        </div>
+
+        <!-- Mockup -->
+        <div class="hero-mockup">
+            <div class="mockup-bar">
+                <div class="dot-r"></div><div class="dot-y"></div><div class="dot-g"></div>
+                <div class="url">🔒 muse-xi-murex.vercel.app</div>
+            </div>
+            <div class="mockup-content">
+                <div class="mock-card p">
+                    <div class="mock-card-title">AI不是工具，是放大器</div>
+                    <div class="mock-card-summary">你给它什么上下文，它放大什么。认知不能外包，但可以借力。</div>
+                    <div class="mock-chips"><span class="mock-chip">AI</span><span class="mock-chip">认知</span><span class="mock-chip">上下文</span></div>
+                </div>
+                <div class="mock-card a">
+                    <div class="mock-card-title">马拉松机器人领跑</div>
+                    <div class="mock-card-summary">机器不再只是工具，它在学习、思考、进化。重新定义可能。</div>
+                    <div class="mock-chips"><span class="mock-chip">机器人</span><span class="mock-chip">进化</span></div>
+                </div>
+                <div class="mock-card b">
+                    <div class="mock-card-title">选题：AI放大器思维</div>
+                    <div class="mock-card-summary">角度：从个人知识管理切入，分享构建有效上下文方法论</div>
+                    <div class="mock-chips"><span class="mock-chip">🔥 HIGH</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Two Pillars -->
+<section class="section" id="features">
+    <div class="wrap">
+        <h2 class="section-title">两个<span class="grad">主动</span>，一个终点</h2>
+        <p class="section-sub">大多数工具是被动等你"想起来用"。Muse 不是。</p>
+
+        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:24px;align-items:center;margin-top:40px">
+            <!-- Pillar 1: 主动捕捉 -->
+            <div class="feature-card" style="text-align:center">
+                <div class="feature-icon g1" style="margin:0 auto 16px">📡</div>
+                <div style="font-size:13px;color:var(--accent);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">第一个主动</div>
+                <div class="feature-title" style="font-size:22px">主动捕捉</div>
+                <div class="feature-desc" style="margin-top:8px">
+                    浏览器插件常驻后台 · 浮动按钮一键抓取<br>
+                    右键菜单 · 快捷键 · Agent API<br>
+                    <strong style="color:var(--text)">不用记着存，系统帮你抓</strong>
+                </div>
+                <div style="margin-top:16px;padding:12px;background:var(--surface2);border-radius:10px;font-size:13px;color:var(--dim)">
+                    ↓ AI 自动提炼标题/摘要/关键词/情绪<br>
+                    ↓ 100+ 模型智能路由，每个节点最优
+                </div>
+            </div>
+
+            <!-- Arrow -->
+            <div style="font-size:40px;color:var(--accent);text-align:center">→</div>
+
+            <!-- Pillar 2: 主动创作 -->
+            <div class="feature-card" style="text-align:center">
+                <div class="feature-icon g3" style="margin:0 auto 16px">✦</div>
+                <div style="font-size:13px;color:var(--accent2);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">第二个主动</div>
+                <div class="feature-title" style="font-size:22px">主动创作</div>
+                <div class="feature-desc" style="margin-top:8px">
+                    基于你的创作DNA + 灵感信号<br>
+                    自动生成选题 · 深潜拆解 · 金句配图<br>
+                    <strong style="color:var(--text)">不用从零想，系统主动生成</strong>
+                </div>
+                <div style="margin-top:16px;padding:12px;background:var(--surface2);border-radius:10px;font-size:13px;color:var(--dim)">
+                    ↓ 爆款标题变体 / 内容结构 / 金句<br>
+                    ↓ 一键生成配图 → <strong style="color:var(--green)">Ship</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ship banner -->
+        <div style="text-align:center;margin-top:40px;padding:20px 40px;background:var(--surface);border:1px solid var(--border);border-radius:16px;display:inline-block;left:50%;transform:translateX(-50%);position:relative">
+            <span style="font-size:16px;color:var(--dim)">两个主动的终点是</span>
+            <span style="font-size:24px;font-weight:800;background:linear-gradient(135deg,#10b981,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-left:8px">Ship.</span>
+            <span style="font-size:14px;color:var(--dim);margin-left:8px">— 让价值流动起来</span>
+        </div>
+    </div>
+</section>
+
+<!-- How it works -->
+<section class="section" id="how">
+    <div class="wrap">
+        <h2 class="section-title">从灵感到 Ship，<span class="grad">全自动</span></h2>
+        <p class="section-sub">每个节点自动选择最优 AI 模型，你只需要确认</p>
+        <div class="flow">
+            <div class="flow-step"><div class="flow-icon">📡</div><div class="flow-label">主动捕捉</div></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step"><div class="flow-icon">🧠</div><div class="flow-label">AI提炼</div></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step"><div class="flow-icon">🧬</div><div class="flow-label">DNA匹配</div></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step"><div class="flow-icon">✦</div><div class="flow-label">主动创作</div></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step" style="border-color:var(--green)"><div class="flow-icon">🚀</div><div class="flow-label" style="color:var(--green)">Ship</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- Models -->
+<section class="section" id="models">
+    <div class="wrap">
+        <h2 class="section-title">100+ AI模型，<span class="grad">智能路由</span></h2>
+        <p class="section-sub">不是调一个模型干所有事。每个节点选最合适的模型，效果最优、成本最低。</p>
+        <div class="models-grid" id="models-grid">
+            <!-- Auto-populated from /api/models -->
+            <div class="model-badge"><div class="model-logo" style="background:rgba(99,102,241,.15);color:#6366f1">DS</div><div><div class="model-name">DeepSeek V3.2</div><div class="model-task">灵感汲取 · 选题 · DNA</div></div></div>
+            <div class="model-badge"><div class="model-logo" style="background:rgba(168,85,247,.15);color:#a855f7">G5</div><div><div class="model-name">GPT-5 Image</div><div class="model-task">金句配图</div></div></div>
+            <div class="model-badge"><div class="model-logo" style="background:rgba(236,72,153,.15);color:#ec4899">GLM</div><div><div class="model-name">GLM-4.6V</div><div class="model-task">图片理解</div></div></div>
+            <div class="model-badge"><div class="model-logo" style="background:rgba(16,185,129,.15);color:#10b981">DS</div><div><div class="model-name">DeepSeek V4 Pro</div><div class="model-task">深度策略分析</div></div></div>
+            <div class="model-badge"><div class="model-logo" style="background:rgba(245,158,11,.15);color:#f59e0b">QW</div><div><div class="model-name">Qwen 3.5 Flash</div><div class="model-task">快速分类</div></div></div>
+            <div class="model-badge"><div class="model-logo" style="background:rgba(59,130,246,.15);color:#3b82f6">CD</div><div><div class="model-name">Claude Sonnet</div><div class="model-task">深度内容生成</div></div></div>
+        </div>
+        <div style="text-align:center;margin-top:24px"><span style="font-size:13px;color:var(--dim)">powered by TokenRouter · 统一API网关</span></div>
+    </div>
+</section>
+
+<!-- Compatibility -->
+<section class="section">
+    <div class="wrap">
+        <h2 class="section-title">支持所有<span class="grad">Agent平台</span></h2>
+        <p class="section-sub">不止 Telegram Bot — 所有 Agent 都能接入</p>
+        <div class="compat-bar">
+            <div class="compat-item"><div class="compat-icon">📱</div><div class="compat-label">Telegram</div></div>
+            <div class="compat-item"><div class="compat-icon">🎮</div><div class="compat-label">Discord</div></div>
+            <div class="compat-item"><div class="compat-icon">💼</div><div class="compat-label">Slack</div></div>
+            <div class="compat-item"><div class="compat-icon">💬</div><div class="compat-label">WhatsApp</div></div>
+            <div class="compat-item"><div class="compat-icon">🌐</div><div class="compat-label">Web API</div></div>
+            <div class="compat-item"><div class="compat-icon">🔌</div><div class="compat-label">Any Agent</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- Extension CTA -->
+<section class="section" id="install">
+    <div class="wrap">
+        <div class="cta-section">
+            <h2>开始<span class="grad">捕捉</span></h2>
+            <p>安装浏览器插件，30秒开始你的第一条灵感</p>
+            <div class="ext-buttons">
+                <a href="/muse-extension-v1.2.zip" download class="ext-btn"><span class="icon">🧩</span> 下载 Chrome 插件</a>
+                <a href="/muse-extension-v1.2.zip" download class="ext-btn"><span class="icon">🦊</span> 下载 Edge 插件</a>
+                <a href="https://muse-xi-murex.vercel.app/onboarding" target="_blank" class="ext-btn"><span class="icon">🚀</span> 在线体验</a>
+            </div>
+            <div style="margin-top:20px;font-size:12px;color:var(--dim)">
+                安装：下载ZIP → 解压 → chrome://extensions → 开发者模式 → 加载已解压的扩展程序
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <div class="wrap footer-inner">
+        <div class="footer-brand">✦ Muse · AI灵感捕手 — BotLearn OPC 2026</div>
+        <div class="footer-links">
+            <a href="https://github.com/KevPH2026/muse" target="_blank">GitHub</a>
+            <a href="https://muse-xi-murex.vercel.app" target="_blank">Dashboard</a>
+            <a href="https://muse-xi-murex.vercel.app/onboarding" target="_blank">Onboarding</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+// Auto-populate model routing from API
+fetch('/api/models').then(r=>r.json()).then(d=>{
+    if(!d.ok)return;
+    const grid=document.getElementById('models-grid');
+    const tasks=Object.entries(d.routing);
+    const colors=['#6366f1','#a855f7','#ec4899','#10b981','#f59e0b','#3b82f6'];
+    grid.innerHTML=tasks.map(([task,info],i)=>{
+        const parts=info.model.split('/');
+        const provider=parts[0]||'';
+        const model=parts[1]||info.model;
+        const initials=model.replace(/[^A-Z0-9]/gi,'').substring(0,3).toUpperCase();
+        const c=colors[i%colors.length];
+        return `<div class="model-badge">
+            <div class="model-logo" style="background:${c}22;color:${c}">${initials}</div>
+            <div><div class="model-name">${model}</div><div class="model-task">${task} · ${info.reason}</div></div>
+        </div>`;
+    }).join('');
+}).catch(()=>{});
+</script>
+</body>
+</html>

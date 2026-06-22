@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Muse · Catch",
+  "version": "1.0.0",
+  "description": "一键捕获正在浏览的内容到 Muse 灵感库 — 任何网页、任何想法，瞬间入库。",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Muse · 捕获灵感",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "permissions": ["activeTab", "contextMenus", "storage", "scripting"],
+  "host_permissions": ["<all_urls>"],
+  "commands": {
+    "capture-page": {
+      "suggested_key": { "default": "Ctrl+Shift+M", "mac": "MacCtrl+Shift+M" },
+      "description": "捕获当前页面到 Muse"
+    }
+  }
+}

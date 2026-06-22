@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Muse · 创作DNA初始化</title>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface2: #1a1a2e;
+  --border: #2a2a3e;
+  --text: #e4e4f0;
+  --text-dim: #8888a0;
+  --accent: #6366f1;
+  --accent2: #a855f7;
+  --accent-grad: linear-gradient(135deg, #6366f1, #a855f7);
+  --success: #10b981;
+  --warn: #f59e0b;
+  --error: #ef4444;
+  --radius: 16px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Animated background */
+.bg-orbs { position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
+.orb { position:absolute; border-radius:50%; filter:blur(80px); opacity:0.15; animation: float 20s infinite ease-in-out; }
+.orb:nth-child(1){ width:400px; height:400px; background:#6366f1; top:-100px; left:-100px; animation-delay:0s;}
+.orb:nth-child(2){ width:300px; height:300px; background:#a855f7; bottom:-50px; right:-50px; animation-delay:-7s;}
+.orb:nth-child(3){ width:250px; height:250px; background:#ec4899; top:40%; left:60%; animation-delay:-14s;}
+@keyframes float {
+  0%,100% { transform:translate(0,0) scale(1); }
+  33% { transform:translate(60px,-40px) scale(1.1); }
+  66% { transform:translate(-40px,60px) scale(0.9); }
+}
+
+.container { position:relative; z-index:1; max-width:680px; margin:0 auto; min-height:100vh; display:flex; flex-direction:column; justify-content:center; padding:40px 24px; }
+
+/* Progress bar */
+.progress-wrap { display:flex; align-items:center; gap:8px; margin-bottom:40px; }
+.step-dot { flex:1; height:4px; border-radius:2px; background:var(--border); transition:all .4s ease; }
+.step-dot.active { background:var(--accent-grad); }
+.step-dot.done { background:var(--success); }
+.step-label { font-size:12px; color:var(--text-dim); margin-left:8px; white-space:nowrap; }
+
+/* Card */
+.card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:40px;
+  position:relative;
+  overflow:hidden;
+}
+.card::before {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height:1px;
+  background:linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+}
+
+/* Step visibility */
+.step { display:none; animation:fadeIn .5s ease; }
+.step.active { display:block; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+/* Typography */
+.brand { font-size:14px; font-weight:700; letter-spacing:2px; text-transform:uppercase; background:var(--accent-grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:8px; }
+h1 { font-size:28px; font-weight:700; line-height:1.3; margin-bottom:12px; }
+h2 { font-size:22px; font-weight:600; margin-bottom:8px; }
+.subtitle { font-size:15px; color:var(--text-dim); line-height:1.6; margin-bottom:28px; }
+
+/* Form elements */
+.field-group { margin-bottom:20px; }
+.field-label { display:block; font-size:14px; font-weight:600; margin-bottom:8px; color:var(--text); }
+.field-hint { font-size:13px; color:var(--text-dim); margin-bottom:8px; }
+
+input[type="text"], input[type="url"], textarea, select {
+  width:100%;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:14px 16px;
+  color:var(--text);
+  font-size:15px;
+  font-family:inherit;
+  transition:all .2s;
+}
+input:focus, textarea:focus, select:focus {
+  outline:none;
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(99,102,241,0.15);
+}
+textarea { min-height:120px; resize:vertical; line-height:1.6; }
+
+/* Chip selection */
+.chips { display:flex; flex-wrap:wrap; gap:10px; }
+.chip {
+  padding:10px 18px;
+  border-radius:24px;
+  border:1px solid var(--border);
+  background:var(--surface2);
+  color:var(--text-dim);
+  font-size:14px;
+  cursor:pointer;
+  transition:all .2s;
+  user-select:none;
+}
+.chip:hover { border-color:var(--accent); color:var(--text); }
+.chip.selected {
+  background:var(--accent-grad);
+  border-color:transparent;
+  color:#fff;
+  font-weight:600;
+}
+
+/* Buttons */
+.btn-row { display:flex; gap:12px; margin-top:28px; }
+.btn {
+  flex:1;
+  padding:14px 24px;
+  border-radius:12px;
+  border:none;
+  font-size:15px;
+  font-weight:600;
+  cursor:pointer;
+  transition:all .2s;
+  font-family:inherit;
+}
+.btn-primary {
+  background:var(--accent-grad);
+  color:#fff;
+}
+.btn-primary:hover { transform:translateY(-1px); box-shadow:0 8px 24px rgba(99,102,241,0.3); }
+.btn-primary:disabled { opacity:0.5; cursor:not-allowed; transform:none; box-shadow:none; }
+.btn-secondary {
+  background:var(--surface2);
+  color:var(--text-dim);
+  border:1px solid var(--border);
+}
+.btn-secondary:hover { color:var(--text); border-color:var(--text-dim); }
+
+/* Analyzing animation */
+.analyze-wrap { text-align:center; padding:40px 0; }
+.spinner {
+  width:60px; height:60px;
+  border:3px solid var(--border);
+  border-top-color:var(--accent);
+  border-right-color:var(--accent2);
+  border-radius:50%;
+  margin:0 auto 24px;
+  animation:spin 1s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+.analyze-text { font-size:15px; color:var(--text-dim); line-height:1.8; }
+.analyze-text .done { color:var(--success); }
+.analyze-log { margin-top:16px; font-size:13px; color:var(--text-dim); font-family:"SF Mono",monospace; text-align:left; max-height:120px; overflow-y:auto; }
+.analyze-log div { padding:2px 0; opacity:0; animation:fadeIn .3s forwards; }
+
+/* DNA Result */
+.dna-summary {
+  background:var(--accent-grad);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  font-size:18px;
+  font-weight:700;
+  margin-bottom:24px;
+  padding:16px;
+  background-color:var(--surface2);
+  border-radius:12px;
+  border:1px solid var(--border);
+}
+.dna-section { margin-bottom:20px; }
+.dna-section-title { font-size:13px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; }
+.dna-tags { display:flex; flex-wrap:wrap; gap:8px; }
+.dna-tag { padding:6px 14px; border-radius:8px; background:var(--surface2); border:1px solid var(--border); font-size:13px; }
+.dna-list { list-style:none; }
+.dna-list li { padding:8px 0; font-size:14px; line-height:1.6; border-bottom:1px solid var(--border); color:var(--text-dim); }
+.dna-list li:last-child { border-bottom:none; }
+.dna-list li strong { color:var(--text); }
+
+/* Link input row */
+.link-row { display:flex; gap:8px; margin-bottom:8px; }
+.link-row input { flex:1; }
+.link-add-btn {
+  background:var(--surface2);
+  border:1px dashed var(--border);
+  border-radius:10px;
+  padding:14px;
+  color:var(--text-dim);
+  cursor:pointer;
+  font-size:14px;
+  width:100%;
+  text-align:center;
+  transition:all .2s;
+}
+.link-add-btn:hover { border-color:var(--accent); color:var(--accent); }
+
+/* Toast */
+.toast {
+  position:fixed;
+  top:24px; left:50%;
+  transform:translateX(-50%);
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:12px 24px;
+  font-size:14px;
+  z-index:1000;
+  opacity:0;
+  transition:all .3s;
+}
+.toast.show { opacity:1; top:32px; }
+.toast.success { border-color:var(--success); color:var(--success); }
+.toast.error { border-color:var(--error); color:var(--error); }
+
+@media(max-width:600px) {
+  .container { padding:20px 16px; }
+  .card { padding:24px; }
+  h1 { font-size:22px; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-orbs">
+  <div class="orb"></div>
+  <div class="orb"></div>
+  <div class="orb"></div>
+</div>
+
+<div class="container">
+  <div class="progress-wrap">
+    <div class="step-dot active" id="dot-1"></div>
+    <div class="step-dot" id="dot-2"></div>
+    <div class="step-dot" id="dot-3"></div>
+    <div class="step-dot" id="dot-4"></div>
+    <span class="step-label" id="step-label">1 / 4 · 认识你</span>
+  </div>
+
+  <div class="card">
+    <!-- STEP 1: Welcome + Field -->
+    <div class="step active" id="step-1">
+      <div class="brand">✦ Muse · 创作DNA</div>
+      <h1>在我开始帮你捕捉灵感之前——<br>让我先了解你。</h1>
+      <p class="subtitle">你的领域、方向、平台，都会成为我理解你创作风格的基础。这样，每一条灵感捕捉，都能和你擅长的东西结合。</p>
+
+      <div class="field-group">
+        <label class="field-label">你的领域是什么？</label>
+        <div class="field-hint">选一个最贴近的，或自己写</div>
+        <div class="chips" id="field-chips">
+          <div class="chip" data-val="跨境数字营销">跨境数字营销</div>
+          <div class="chip" data-val="AI/科技">AI/科技</div>
+          <div class="chip" data-val="品牌策略">品牌策略</div>
+          <div class="chip" data-val="电商运营">电商运营</div>
+          <div class="chip" data-val="内容创作">内容创作</div>
+          <div class="chip" data-val="产品设计">产品设计</div>
+          <div class="chip" data-val="创业/投资">创业/投资</div>
+          <div class="chip" data-val="教育">教育</div>
+        </div>
+        <input type="text" id="field-custom" placeholder="或输入你的领域…" style="margin-top:10px;">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">你的创作方向？</label>
+        <div class="field-hint">你主要做什么类型的内容？</div>
+        <input type="text" id="direction-input" placeholder="如：AI行业洞察、商业拆解、短视频知识分享…">
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="goStep(2)">继续 →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Platforms -->
+    <div class="step" id="step-2">
+      <h1>你在哪些平台创作？</h1>
+      <p class="subtitle">选择你活跃的平台，选一个主力平台。这决定了我从哪里分析你的内容DNA。</p>
+
+      <div class="field-group">
+        <label class="field-label">创作平台（可多选）</label>
+        <div class="chips" id="platform-chips">
+          <div class="chip" data-val="抖音">📱 抖音</div>
+          <div class="chip" data-val="小红书">📕 小红书</div>
+          <div class="chip" data-val="微信公众号">💬 公众号</div>
+          <div class="chip" data-val="B站">🎬 B站</div>
+          <div class="chip" data-val="视频号">📹 视频号</div>
+          <div class="chip" data-val="X/Twitter">🐦 X/Twitter</div>
+          <div class="chip" data-val="LinkedIn">💼 LinkedIn</div>
+          <div class="chip" data-val="知乎">📖 知乎</div>
+          <div class="chip" data-val="微博">🌐 微博</div>
+          <div class="chip" data-val="YouTube">▶️ YouTube</div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">主力平台是哪个？</label>
+        <select id="main-platform-select">
+          <option value="">从上面选的平台里挑一个…</option>
+        </select>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="goStep(1)">← 返回</button>
+        <button class="btn btn-primary" onclick="goStep(3)">继续 →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Links / Content -->
+    <div class="step" id="step-3">
+      <h1>给我看你的作品</h1>
+      <p class="subtitle">丢一个你的主页链接，我来分析你的创作DNA。<br>或者直接粘贴你的作品文字内容。</p>
+
+      <div class="field-group">
+        <label class="field-label">方式一：你的平台主页链接</label>
+        <div class="field-hint">抖音/小红书/B站/YouTube 等主页URL</div>
+        <div id="link-inputs">
+          <div class="link-row">
+            <input type="url" class="link-input" placeholder="https://www.douyin.com/user/xxx">
+          </div>
+        </div>
+        <button class="link-add-btn" onclick="addLinkInput()">+ 添加另一个平台链接</button>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">方式二：直接粘贴内容</label>
+        <div class="field-hint">把你的作品文案/标题/脚本粘贴进来（多条用 --- 分隔）</div>
+        <textarea id="content-input" placeholder="例如：&#10;AI不是工具，是放大器…&#10;---&#10;认知不能外包，但可以借力…&#10;---&#10;你的资产不是信息，是上下文…"></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="goStep(2)">← 返回</button>
+        <button class="btn btn-primary" onclick="startAnalysis()" id="analyze-btn">✦ 开始DNA分析</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Analyzing + Result -->
+    <div class="step" id="step-4">
+      <div id="analyzing-view">
+        <div class="analyze-wrap">
+          <div class="spinner"></div>
+          <div class="analyze-text" id="analyze-status">正在保存你的创作档案…</div>
+          <div class="analyze-log" id="analyze-log"></div>
+        </div>
+      </div>
+
+      <div id="result-view" style="display:none;">
+        <div class="brand">✦ 你的创作DNA</div>
+        <div class="dna-summary" id="dna-summary"></div>
+
+        <div class="dna-section">
+          <div class="dna-section-title">🎯 核心主题</div>
+          <div class="dna-tags" id="dna-themes"></div>
+        </div>
+
+        <div class="dna-section">
+          <div class="dna-section-title">🎨 创作风格</div>
+          <div id="dna-style" style="font-size:15px; line-height:1.6; color:var(--text-dim);"></div>
+        </div>
+
+        <div class="dna-section">
+          <div class="dna-section-title">💪 你的优势</div>
+          <ul class="dna-list" id="dna-strengths"></ul>
+        </div>
+
+        <div class="dna-section">
+          <div class="dna-section-title">🚀 建议</div>
+          <ul class="dna-list" id="dna-recommendations"></ul>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-secondary" onclick="goStep(3)">← 补充内容</button>
+          <button class="btn btn-primary" onclick="completeOnboarding()">✦ 完成，开始使用 →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = window.location.origin;
+let currentStep = 1;
+let selectedField = '';
+let selectedPlatforms = [];
+let profileData = {};
+
+// Chip selection
+document.querySelectorAll('#field-chips .chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('#field-chips .chip').forEach(c => c.classList.remove('selected'));
+    chip.classList.add('selected');
+    selectedField = chip.dataset.val;
+    document.getElementById('field-custom').value = '';
+  });
+});
+document.getElementById('field-custom').addEventListener('input', (e) => {
+  if (e.target.value.trim()) {
+    document.querySelectorAll('#field-chips .chip').forEach(c => c.classList.remove('selected'));
+    selectedField = e.target.value.trim();
+  }
+});
+
+document.querySelectorAll('#platform-chips .chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    chip.classList.toggle('selected');
+    const val = chip.dataset.val;
+    if (chip.classList.contains('selected')) {
+      if (!selectedPlatforms.includes(val)) selectedPlatforms.push(val);
+    } else {
+      selectedPlatforms = selectedPlatforms.filter(p => p !== val);
+    }
+    updateMainPlatformOptions();
+  });
+});
+
+function updateMainPlatformOptions() {
+  const sel = document.getElementById('main-platform-select');
+  const current = sel.value;
+  sel.innerHTML = '<option value="">从上面选的平台里挑一个…</option>';
+  selectedPlatforms.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p; opt.textContent = p;
+    sel.appendChild(opt);
+  });
+  if (selectedPlatforms.includes(current)) sel.value = current;
+}
+
+function addLinkInput() {
+  const container = document.getElementById('link-inputs');
+  const row = document.createElement('div');
+  row.className = 'link-row';
+  row.innerHTML = '<input type="url" class="link-input" placeholder="https://..."><button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:20px;padding:0 8px;">×</button>';
+  container.appendChild(row);
+}
+
+// Step navigation
+function goStep(n) {
+  // Validate
+  if (n > currentStep) {
+    if (currentStep === 1 && !selectedField && !document.getElementById('field-custom').value.trim()) {
+      showToast('选一下你的领域吧', 'error'); return;
+    }
+    if (currentStep === 2 && selectedPlatforms.length === 0) {
+      showToast('至少选一个创作平台', 'error'); return;
+    }
+  }
+
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step-' + n).classList.add('active');
+  currentStep = n;
+
+  // Update progress dots
+  for (let i = 1; i <= 4; i++) {
+    const dot = document.getElementById('dot-' + i);
+    dot.classList.remove('active', 'done');
+    if (i < n) dot.classList.add('done');
+    else if (i === n) dot.classList.add('active');
+  }
+  document.getElementById('step-label').textContent = `${n} / 4 · ${['认识你', '你的平台', '你的作品', 'DNA分析'][n-1]}`;
+}
+
+// Analysis
+async function startAnalysis() {
+  // Collect data
+  profileData = {
+    user_id: 'default',
+    field: selectedField || document.getElementById('field-custom').value.trim(),
+    creation_direction: document.getElementById('direction-input').value.trim(),
+    platforms: selectedPlatforms,
+    main_platform: document.getElementById('main-platform-select').value,
+  };
+
+  const links = Array.from(document.querySelectorAll('.link-input'))
+    .map(i => i.value.trim()).filter(Boolean);
+  const content = document.getElementById('content-input').value.trim();
+
+  if (!links.length && !content) {
+    showToast('至少提供一个链接或粘贴内容', 'error');
+    return;
+  }
+
+  goStep(4);
+  const log = document.getElementById('analyze-log');
+  log.innerHTML = '';
+
+  // Step 1: Save profile
+  await logStep(log, '→ 保存创作档案…', async () => {
+    const r = await fetch(`${API}/api/onboarding/profile`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(profileData)
+    });
+    return r.ok;
+  });
+
+  // Step 2: Analyze links
+  let allDna = null;
+  for (const link of links) {
+    await logStep(log, `→ 分析链接: ${link.substring(0, 50)}…`, async () => {
+      const r = await fetch(`${API}/api/onboarding/analyze-link`, {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ url: link, user_id: 'default', profile: profileData })
+      });
+      const data = await r.json();
+      if (data.ok && data.dna) allDna = data.dna;
+      return data.ok !== false;
+    });
+  }
+
+  // Step 3: Analyze content
+  if (content) {
+    await logStep(log, `→ 分析粘贴内容 (${content.length} chars)…`, async () => {
+      const r = await fetch(`${API}/api/onboarding/analyze-content`, {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ content, user_id: 'default', profile: profileData })
+      });
+      const data = await r.json();
+      if (data.ok && data.dna) allDna = data.dna;
+      return data.ok !== false;
+    });
+  }
+
+  // Step 4: Show DNA results
+  if (allDna) {
+    document.getElementById('analyze-status').innerHTML = '<span class="done">✓ DNA分析完成！</span>';
+    await sleep(800);
+    showDNA(allDna);
+  } else {
+    document.getElementById('analyze-status').innerHTML = '<span style="color:var(--error)">分析未成功，但档案已保存</span>';
+    log.innerHTML += '<div style="color:var(--text-dim);padding:8px 0;">💡 你可以稍后在看板中补充内容重新分析</div>';
+    setTimeout(() => showDNA({
+      themes: ['待挖掘'], tone: '待分析', formats: ['待分析'],
+      strengths: ['档案已建立，等待更多内容'], recommendations: ['持续捕捉灵感，DNA会自动更新'],
+      dna_summary: '初始档案已建立 — 提供更多内容解锁深度DNA', signature_style: '待识别'
+    }), 2000);
+  }
+}
+
+async function logStep(logEl, text, fn) {
+  document.getElementById('analyze-status').textContent = text;
+  const div = document.createElement('div');
+  div.textContent = text;
+  logEl.appendChild(div);
+  await sleep(300);
+  try {
+    const ok = await fn();
+    div.innerHTML = ok ? `✓ ${text.replace('→ ','')}` : `⚠ ${text.replace('→ ','')}`;
+    div.style.color = ok ? 'var(--success)' : 'var(--warn)';
+  } catch(e) {
+    div.innerHTML = `✗ ${text.replace('→ ','')} — ${e.message}`;
+    div.style.color = 'var(--error)';
+  }
+  await sleep(300);
+}
+
+function showDNA(dna) {
+  document.getElementById('analyzing-view').style.display = 'none';
+  document.getElementById('result-view').style.display = 'block';
+
+  document.getElementById('dna-summary').textContent = dna.dna_summary || 'DNA分析完成';
+
+  const themesEl = document.getElementById('dna-themes');
+  themesEl.innerHTML = '';
+  (dna.themes || []).forEach(t => {
+    const tag = document.createElement('div');
+    tag.className = 'dna-tag'; tag.textContent = t;
+    themesEl.appendChild(tag);
+  });
+
+  let styleHtml = '';
+  if (dna.tone) styleHtml += `<strong>语调:</strong> ${dna.tone}<br>`;
+  if (dna.signature_style) styleHtml += `<strong>标志风格:</strong> ${dna.signature_style}<br>`;
+  if (dna.audience_appeal) styleHtml += `<strong>受众吸引力:</strong> ${dna.audience_appeal}`;
+  document.getElementById('dna-style').innerHTML = styleHtml || '待分析';
+
+  const strEl = document.getElementById('dna-strengths');
+  strEl.innerHTML = '';
+  (dna.strengths || []).forEach(s => {
+    const li = document.createElement('li');
+    li.innerHTML = s; strEl.appendChild(li);
+  });
+
+  const recEl = document.getElementById('dna-recommendations');
+  recEl.innerHTML = '';
+  (dna.recommendations || []).forEach(r => {
+    const li = document.createElement('li');
+    li.innerHTML = r; recEl.appendChild(li);
+  });
+}
+
+function completeOnboarding() {
+  showToast('✅ Onboarding完成！灵感捕捉已激活', 'success');
+  setTimeout(() => window.location.href = '/', 1500);
+}
+
+// Helpers
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + (type || '');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// Check if onboarding already done
+fetch(`${API}/api/onboarding/status/default`).then(r => r.json()).then(data => {
+  if (data.onboarding_complete) {
+    // Show a prompt
+    const card = document.querySelector('.card');
+    const banner = document.createElement('div');
+    banner.style.cssText = 'background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:var(--text-dim);';
+    banner.innerHTML = '💡 你已完成过Onboarding（分析了' + data.analyzed_count + '条内容）。可以重新填写更新DNA。';
+    card.insertBefore(banner, card.firstChild);
+  }
+});
+</script>
+</body>
+</html>

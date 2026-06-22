@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+muse.db
+*.log
+.vercel/
+node_modules/

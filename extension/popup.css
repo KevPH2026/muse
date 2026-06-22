@@ -1,0 +1,247 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --purple: #6366f1;
+  --purple-light: #818cf8;
+  --purple-dark: #4f46e5;
+  --bg: #0f0f14;
+  --bg-card: #1a1a24;
+  --border: #2a2a3a;
+  --text: #e4e4ea;
+  --text-dim: #8888a0;
+  --green: #22c55e;
+  --red: #ef4444;
+}
+
+body {
+  width: 380px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+}
+
+.container {
+  padding: 16px;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.logo {
+  font-size: 18px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--purple-light), #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.tagline {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+/* Current Page Card */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.card-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+
+.page-title {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+.page-url {
+  font-size: 11px;
+  color: var(--purple-light);
+  word-break: break-all;
+  opacity: 0.7;
+}
+
+/* Form */
+.form-group {
+  margin-bottom: 10px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+.hint {
+  font-size: 10px;
+  color: var(--text-dim);
+  opacity: 0.6;
+}
+
+textarea {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 8px;
+  font-size: 12px;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+textarea:focus {
+  border-color: var(--purple);
+}
+
+/* Tags */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+
+.tag:hover {
+  border-color: var(--purple-light);
+}
+
+.tag.active {
+  background: var(--purple-dark);
+  border-color: var(--purple);
+  color: white;
+}
+
+/* Capture Button */
+.capture-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--purple-dark), var(--purple));
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.capture-btn:hover {
+  background: linear-gradient(135deg, var(--purple), var(--purple-light));
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+}
+
+.capture-btn:active {
+  transform: translateY(0);
+}
+
+.capture-btn.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.btn-icon {
+  font-size: 18px;
+}
+
+/* Status */
+.status {
+  text-align: center;
+  font-size: 12px;
+  min-height: 20px;
+  margin-top: 8px;
+  transition: all 0.3s;
+}
+
+.status.success { color: var(--green); }
+.status.error { color: var(--red); }
+
+/* Footer */
+.footer {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.settings-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: color 0.2s;
+}
+
+.settings-btn:hover { color: var(--text); }
+
+/* Settings Panel */
+.settings-panel {
+  margin-top: 8px;
+  padding: 10px;
+  background: var(--bg-card);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+#api-url {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 6px 8px;
+  font-size: 12px;
+  outline: none;
+  margin-bottom: 6px;
+}
+
+#api-url:focus { border-color: var(--purple); }
+
+.save-btn {
+  width: 100%;
+  padding: 6px;
+  border: none;
+  border-radius: 6px;
+  background: var(--purple-dark);
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+}
